@@ -6,7 +6,6 @@ import { userLogOut } from "../../features/auth/authSlice";
 export default function Navigation() {
   const dispatch = useDispatch();
   const handleLogout = () => {
-    console.log("Hi");
     dispatch(userLogOut());
     localStorage.setItem("auth", JSON.stringify(null));
   };

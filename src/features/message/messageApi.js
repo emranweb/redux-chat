@@ -5,7 +5,7 @@ const messageApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getMessages: builder.query({
       query: (id) => ({
-        query: "/messages",
+        url: `/messages?conversationId=${id}`,
         method: "GET",
       }),
     }),
