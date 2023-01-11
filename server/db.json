@@ -5,6 +5,18 @@
       "password": "$2a$10$1O9q6mOcjODj6Phvfknj4epCXJsXyvCxksDg/6mEvc5WoP0d5ls/e",
       "name": "sumit",
       "id": 1
+    },
+    {
+      "email": "saad@learnwithsumit.com",
+      "password": "$2a$10$kpj3LeKhBsWv7rkXc21sRegk45DrYhZf.6R/W8eSneDAOG7JUOs4K",
+      "name": "saad",
+      "id": 2
+    },
+    {
+      "email": "akash@learnwithsumit.com",
+      "password": "$2a$10$buXP63d7TZ/pABgeBNGLQOFX0r0gCaaMS5p.6LL7J7V2vRe4.ucE2",
+      "name": "akash",
+      "id": 3
     }
   ],
   "conversations": [

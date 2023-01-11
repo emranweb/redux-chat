@@ -1,5 +1,5 @@
 import ChatItem from "./ChatItem";
-import { useGetConversationQuery } from "../../features/conversation/conversationApi";
+import { useGetConversationsQuery } from "../../features/conversation/conversationApi";
 import { useSelector } from "react-redux";
 import moment from "moment";
 import gravatarUrl from "gravatar-url";
@@ -12,7 +12,7 @@ export default function ChatItems() {
     error,
     isLoading,
     isError,
-  } = useGetConversationQuery(authData.user.email);
+  } = useGetConversationsQuery(authData.user.email);
 
   let content = null;
   if (isLoading) {
