@@ -1,7 +1,6 @@
-import { fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiSlice } from "../api/apislice";
 
-const conversationApiSlice = apiSlice.injectEndpoints({
+export const conversationApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getConversations: builder.query({
       query: (email) => ({
