@@ -3,7 +3,11 @@ import { useGetUserQuery } from "../../features/users/usersApi";
 import { mailValidationCheck } from "../ui/isValidate";
 import Error from "../ui/Error";
 import { useDispatch, useSelector } from "react-redux";
-import { conversationApiSlice } from "../../features/conversation/conversationApi";
+import {
+  conversationApiSlice,
+  useAddConversationMutation,
+  useEditConversationMutation,
+} from "../../features/conversation/conversationApi";
 
 function debouce(func, delay) {
   let timer;
@@ -28,6 +32,18 @@ export default function Modal({ open, control }) {
     skip: !checkUser,
   });
 
+  console.log(userEmail);
+
+  // add conversation
+
+  const [addConversation, { isSuccess: addConversationSuccess }] =
+    useAddConversationMutation();
+
+  // edit conversation
+
+  const [editConversation, { isSuccess: editConversationSuccess }] =
+    useEditConversationMutation();
+
   const dispatch = useDispatch();
 
   useEffect(() => {
@@ -39,11 +55,19 @@ export default function Modal({ open, control }) {
         })
       )
         .unwrap()
-        .then((data) => console.log(data))
+        .then((data) => setConversation(data))
         .catch((error) => setError(error));
     }
     // get conversation
   }, [userEmail, dispatch, loginUser, to]);
+
+  // conversation sucess modal close
+
+  useEffect(() => {
+    if (addConversationSuccess || editConversationSuccess) {
+      control();
+    }
+  }, [addConversationSuccess, editConversationSuccess]);
 
   const mailCheck = (value) => {
     const valid = mailValidationCheck(value);
@@ -55,6 +79,31 @@ export default function Modal({ open, control }) {
   };
 
   const handleChange = debouce(mailCheck, 1000);
+  // form submit
+
+  const formSubmit = (event) => {
+    event.preventDefault();
+    if (conversation?.length > 0) {
+      editConversation({
+        id: conversation[0].id,
+        data: {
+          participants: `${loginUser}-${userEmail[0].email}`,
+          users: [user, userEmail[0]],
+          sender: loginUser,
+          message,
+          timeStamp: new Date().getTime(),
+        },
+      });
+    } else if (conversation?.length === 0) {
+      addConversation({
+        participants: `${loginUser}-${userEmail[0].email}`,
+        sender: loginUser,
+        users: [user, userEmail[0]],
+        message,
+        timeStamp: new Date().getTime(),
+      });
+    }
+  };
 
   return (
     open && (
@@ -67,7 +116,12 @@ export default function Modal({ open, control }) {
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Send message
           </h2>
-          <form className="mt-8 space-y-6" action="#" method="POST">
+          <form
+            className="mt-8 space-y-6"
+            action="#"
+            method="POST"
+            onSubmit={formSubmit}
+          >
             <input type="hidden" name="remember" value="true" />
             <div className="rounded-md shadow-sm -space-y-px">
               <div>
@@ -103,12 +157,17 @@ export default function Modal({ open, control }) {
             <div>
               <button
                 type="submit"
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500"
+                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 disabled:opacity-30"
+                disabled={
+                  conversation === undefined ||
+                  (userEmail?.length > 0 && userEmail[0].email === loginUser)
+                }
               >
                 Send Message
               </button>
             </div>
             {userEmail?.length === 0 && <Error message="No user Found" />}
+            {error && <Error message={error} />}
             {userEmail?.length > 0 && userEmail[0].email === loginUser && (
               <Error message="You Can't Send Email Yourself" />
             )}
