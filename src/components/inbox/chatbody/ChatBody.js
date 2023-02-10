@@ -20,7 +20,7 @@ export default function ChatBody() {
       <div className="w-full grid conversation-row-grid">
         <ChatHead message={messages[0]} />
         <Messages messages={messages} />
-        <Options />
+        <Options info={messages[0]} />
         {/* <Blank /> */}
       </div>
     );

@@ -31,7 +31,7 @@ export const conversationApiSlice = apiSlice.injectEndpoints({
 
           dispatch(
             messageApiSlice.endpoints.addMessage.initiate({
-              conversationId: conversation.id,
+              conversationId: conversation?.data.id,
               message: arg.message,
               sender,
               receiver,
@@ -51,18 +51,16 @@ export const conversationApiSlice = apiSlice.injectEndpoints({
         console.log("it here");
         const conversation = await queryFulfilled;
         if (conversation?.data.id) {
-          console.log(arg);
           const sender = arg.data.users.find(
             (user) => user.email === arg.data.sender
           );
           const receiver = arg.data.users.find(
             (user) => user.email !== arg.data.sender
           );
-          console.log("add conversation");
 
           dispatch(
             messageApiSlice.endpoints.addMessage.initiate({
-              conversationId: conversation.id,
+              conversationId: conversation?.data.id,
               message: arg.data.message,
               sender,
               receiver,

@@ -42,49 +42,17 @@
           "id": 1
         }
       ],
-      "message": "How are you ?",
-      "timeStamp": 1675788579067,
-      "id": 1
-    },
-    {
-      "participants": "sumit@learnwithsumit.com-emran@emranweb.co",
-      "sender": "sumit@learnwithsumit.com",
-      "users": [
-        {
-          "email": "sumit@learnwithsumit.com",
-          "name": "sumit",
-          "id": 1
-        },
-        {
-          "email": "emran@emranweb.co",
-          "password": "$2a$10$jk2RpWIHu3xQNMauF.VlNeIBPjYmSu8DYTZCo.asguqxD0lut5d6.",
-          "name": "emran",
-          "id": 4
-        }
-      ],
-      "message": "I am good",
-      "timeStamp": 1675788786412,
-      "id": 2
+      "message": "work",
+      "timeStamp": 1675967761854,
+      "id": 1,
+      "participent": "emran@emranweb.co-sumit@learnwithsumit.com",
+      "timestamp": 1675968124106
     }
   ],
   "messages": [
     {
-      "message": "Hi",
-      "sender": {
-        "email": "emran@emranweb.co",
-        "name": "emran",
-        "id": 4
-      },
-      "receiver": {
-        "email": "sumit@learnwithsumit.com",
-        "password": "$2a$10$1O9q6mOcjODj6Phvfknj4epCXJsXyvCxksDg/6mEvc5WoP0d5ls/e",
-        "name": "sumit",
-        "id": 1
-      },
-      "id": 1
-    },
-    {
-      "message": "How are you ?",
+      "conversationId": 1,
+      "message": "Hello",
       "sender": {
         "email": "emran@emranweb.co",
         "name": "emran",
@@ -99,19 +67,26 @@
       "id": 2
     },
     {
-      "message": "I am good",
-      "sender": {
-        "email": "sumit@learnwithsumit.com",
-        "name": "sumit",
-        "id": 1
-      },
+      "conversationId": 1,
+      "message": "Hi",
       "receiver": {
         "email": "emran@emranweb.co",
-        "password": "$2a$10$jk2RpWIHu3xQNMauF.VlNeIBPjYmSu8DYTZCo.asguqxD0lut5d6.",
         "name": "emran",
         "id": 4
       },
+      "timestamp": 1675968024152,
       "id": 3
+    },
+    {
+      "conversationId": 1,
+      "message": "work",
+      "receiver": {
+        "email": "emran@emranweb.co",
+        "name": "emran",
+        "id": 4
+      },
+      "timestamp": 1675968124106,
+      "id": 4
     }
   ]
 }

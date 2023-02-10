@@ -11,7 +11,7 @@ export default function Messages({ messages = [] }) {
           .sort((a, b) => a.timestamp - b.timestamp)
           .map((message) => {
             const { message: lastMessage, id, sender } = message;
-            const justify = sender.email === userEmail ? "end" : "start";
+            const justify = sender?.email === userEmail ? "end" : "start";
             return <Message key={id} justify={justify} message={lastMessage} />;
           })}
       </ul>
