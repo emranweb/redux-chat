@@ -32,8 +32,6 @@ export default function Modal({ open, control }) {
     skip: !checkUser,
   });
 
-  console.log(userEmail);
-
   // add conversation
 
   const [addConversation, { isSuccess: addConversationSuccess }] =

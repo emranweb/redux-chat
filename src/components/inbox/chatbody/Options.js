@@ -5,8 +5,7 @@ import { useEditConversationMutation } from "../../../features/conversation/conv
 export default function Options({ info }) {
   const [message, setMessage] = useState("");
   const loginUsesr = useSelector((state) => state.auth);
-  const [editConversation, { isSuccess, isError }] =
-    useEditConversationMutation();
+  const [editConversation] = useEditConversationMutation();
 
   const sender = loginUsesr.user.email;
 
@@ -15,10 +14,10 @@ export default function Options({ info }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
-    console.log(info);
+
     editConversation({
       id: info?.conversationId,
-      sender: sender,
+      sender,
       data: {
         participent: `${sender}-${participent.email}`,
         users: [loginUsesr.user, participent],

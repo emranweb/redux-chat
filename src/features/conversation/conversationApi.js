@@ -15,6 +15,7 @@ export const conversationApiSlice = apiSlice.injectEndpoints({
         method: "GET",
       }),
     }),
+    // add conversation mudation for add a new conversation
     addConversation: builder.mutation({
       query: (data) => ({
         url: `/conversations`,
@@ -23,6 +24,16 @@ export const conversationApiSlice = apiSlice.injectEndpoints({
       }),
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         const conversation = await queryFulfilled;
+
+        dispatch(
+          apiSlice.util.updateQueryData(
+            "getConversations",
+            conversation.data.sender,
+            (draft) => {
+              draft.push(conversation.data);
+            }
+          )
+        );
 
         try {
           if (conversation?.data.id) {
@@ -42,21 +53,25 @@ export const conversationApiSlice = apiSlice.injectEndpoints({
             );
           }
         } catch (error) {
-          // conversationUpdate.undo();
+          console.log("conversation error");
         }
       },
     }),
+
+    // edit conversation mutaion for edit the existing conversation
     editConversation: builder.mutation({
-      query: ({ id, data }) => ({
+      query: ({ id, sender, data }) => ({
         url: `/conversations/${id}`,
         method: "PATCH",
         body: data,
       }),
+
+      // after query fulltill it called the getConversation query
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         const conversationUpdate = dispatch(
           apiSlice.util.updateQueryData(
             "getConversations",
-            arg.data.sender,
+            arg.sender,
             (draft) => {
               const draftConversation = draft.find((c) => c.id == arg.id);
               draftConversation.message = arg.data.message;
@@ -69,12 +84,14 @@ export const conversationApiSlice = apiSlice.injectEndpoints({
         try {
           if (conversation?.data.id) {
             const sender = arg.data.users.find(
-              (user) => user.email === arg.data.sender
-            );
-            const receiver = arg.data.users.find(
-              (user) => user.email !== arg.data.sender
+              (user) => user.email === arg.sender
             );
 
+            const receiver = arg.data.users.find(
+              (user) => user.email !== arg.sender
+            );
+
+            // create a new message on existing conversation
             const res = await dispatch(
               messageApiSlice.endpoints.addMessage.initiate({
                 conversationId: conversation?.data.id,
@@ -85,12 +102,15 @@ export const conversationApiSlice = apiSlice.injectEndpoints({
               })
             ).unwrap();
 
-            apiSlice.util.updateQueryData(
-              "getMessages",
-              res.conversationId.toString(),
-              (draft) => {
-                draft.push(res);
-              }
+            // after the message set call the get message query
+            dispatch(
+              apiSlice.util.updateQueryData(
+                "getMessages",
+                res.conversationId.toString(),
+                (draft) => {
+                  draft.push(res);
+                }
+              )
             );
           }
         } catch (error) {

@@ -13,7 +13,6 @@ export default function ChatItems() {
     isLoading,
     isError,
   } = useGetConversationsQuery(authData.user.email);
-  console.log(conversation);
 
   let content = null;
   if (isLoading) {
