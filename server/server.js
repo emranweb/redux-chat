@@ -5,24 +5,13 @@ const http = require("http");
 
 const app = express();
 const server = http.createServer(app);
-
 const io = require("socket.io")(server);
-// for access acess function globally
 
 global.io = io;
 
-io.on("connection", (client) => {
-  client.on("event", (data) => {
-    /* … */
-  });
-  client.on("disconnect", () => {
-    /* … */
-  });
-});
-
-//const server = jsonServer.create();
 const router = jsonServer.router("db.json");
 
+// response middleware
 router.render = (req, res) => {
   const path = req.path;
   const method = req.method;
@@ -36,9 +25,16 @@ router.render = (req, res) => {
       data: res.locals.data,
     });
   }
-  console.log(path, method);
+
+  if (path.includes("/messages") && (method === "POST" || method === "PATCH")) {
+    io.emit("message", {
+      data: res.locals.data,
+    });
+  }
+
   res.json(res.locals.data);
 };
+
 const middlewares = jsonServer.defaults();
 const port = process.env.PORT || 9000;
 
