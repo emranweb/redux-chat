@@ -1,6 +1,9 @@
 import { fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { apiSlice } from "../api/apislice";
 import { io } from "socket.io-client";
+import { createEntityAdapter } from "@reduxjs/toolkit";
+
+const messagesAdapter = createEntityAdapter();
 
 export const messageApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
@@ -25,10 +28,8 @@ export const messageApiSlice = apiSlice.injectEndpoints({
         try {
           await cacheDataLoaded;
           socket.on("message", (data) => {
-            console.log(data);
             updateCachedData((draft) => {
-              let message = draft.find((m) => console.log(m.id));
-              console.log(message);
+              messagesAdapter.upsertOne(draft, data.data);
             });
           });
         } catch (error) {
