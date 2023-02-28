@@ -26,14 +26,27 @@ export const conversationApiSlice = apiSlice.injectEndpoints({
 
         try {
           await cacheDataLoaded;
+          console.log("cashe entry loaded");
           socket.on("conversation", (data) => {
+            console.log("requested");
+            console.log(data);
+
             updateCachedData((draft) => {
+              console.log(draft.length);
               const conversation = draft.find((c) => c.id == data?.data?.id);
+              console.log(conversation);
 
               if (conversation?.id) {
                 conversation.message = data?.data?.message;
                 conversation.timestamp = data?.data?.timestamp;
               } else {
+                const participants = data?.data?.participants.split("-");
+                const sender = participants[0];
+                const receiver = participants[1];
+                console.log(draft.data);
+                if (receiver === arg) {
+                  draft.push(data?.data);
+                }
               }
             });
           });

@@ -29,7 +29,13 @@ export const messageApiSlice = apiSlice.injectEndpoints({
           await cacheDataLoaded;
           socket.on("message", (data) => {
             updateCachedData((draft) => {
-              messagesAdapter.upsertOne(draft, data.data);
+              const message = draft.find((m) => m.id == data?.data.id);
+              if (message) {
+                message.message = data.data.message;
+                message.timestamp = data.data.timestamp;
+              } else {
+                draft.unshift(data.data);
+              }
             });
           });
         } catch (error) {

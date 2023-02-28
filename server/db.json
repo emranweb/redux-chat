@@ -42,17 +42,15 @@
           "id": 1
         }
       ],
-      "message": "x",
-      "timeStamp": 1677440420208,
-      "id": 1,
-      "participent": "emran@emranweb.co-sumit@learnwithsumit.com",
-      "timestamp": 1677440574925
+      "message": "hi",
+      "timeStamp": 1677556968302,
+      "id": 1
     }
   ],
   "messages": [
     {
       "conversationId": 1,
-      "message": "Hi",
+      "message": "hi",
       "sender": {
         "email": "emran@emranweb.co",
         "name": "emran",
@@ -65,57 +63,6 @@
         "id": 1
       },
       "id": 1
-    },
-    {
-      "conversationId": 1,
-      "message": "bo",
-      "sender": {
-        "email": "emran@emranweb.co",
-        "name": "emran",
-        "id": 4
-      },
-      "receiver": {
-        "email": "sumit@learnwithsumit.com",
-        "password": "$2a$10$1O9q6mOcjODj6Phvfknj4epCXJsXyvCxksDg/6mEvc5WoP0d5ls/e",
-        "name": "sumit",
-        "id": 1
-      },
-      "timestamp": 1677440466052,
-      "id": 2
-    },
-    {
-      "conversationId": 1,
-      "message": "dd",
-      "sender": {
-        "email": "emran@emranweb.co",
-        "name": "emran",
-        "id": 4
-      },
-      "receiver": {
-        "email": "sumit@learnwithsumit.com",
-        "password": "$2a$10$1O9q6mOcjODj6Phvfknj4epCXJsXyvCxksDg/6mEvc5WoP0d5ls/e",
-        "name": "sumit",
-        "id": 1
-      },
-      "timestamp": 1677440511813,
-      "id": 3
-    },
-    {
-      "conversationId": 1,
-      "message": "x",
-      "sender": {
-        "email": "emran@emranweb.co",
-        "name": "emran",
-        "id": 4
-      },
-      "receiver": {
-        "email": "sumit@learnwithsumit.com",
-        "password": "$2a$10$1O9q6mOcjODj6Phvfknj4epCXJsXyvCxksDg/6mEvc5WoP0d5ls/e",
-        "name": "sumit",
-        "id": 1
-      },
-      "timestamp": 1677440574925,
-      "id": 4
     }
   ]
 }
