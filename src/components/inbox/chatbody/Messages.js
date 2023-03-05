@@ -1,5 +1,6 @@
 import Message from "./Message";
 import { useSelector } from "react-redux";
+import { v4 as uuidv4 } from "uuid";
 
 export default function Messages({ messages = [] }) {
   const userEmail = useSelector((state) => state.auth.user.email);
@@ -12,7 +13,9 @@ export default function Messages({ messages = [] }) {
           .map((message) => {
             const { message: lastMessage, id, sender } = message;
             const justify = sender?.email === userEmail ? "end" : "start";
-            return <Message key={id} justify={justify} message={lastMessage} />;
+            return (
+              <Message key={uuidv4()} justify={justify} message={lastMessage} />
+            );
           })}
       </ul>
     </div>

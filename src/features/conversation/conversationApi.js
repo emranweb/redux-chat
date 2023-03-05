@@ -1,14 +1,17 @@
+import { current } from "@reduxjs/toolkit";
 import { io } from "socket.io-client";
 import { apiSlice } from "../api/apislice";
 import { messageApiSlice } from "../message/messageApi";
 
 export const conversationApiSlice = apiSlice.injectEndpoints({
+  tagTypes: ["conversation"],
   endpoints: (builder) => ({
     getConversations: builder.query({
       query: (email) => ({
         url: `/conversations?participants_like=${email}&_sort=timestamp&_order=desc&_page=1&_limit=5`,
         method: "GET",
       }),
+      invalidatesTags: ["getconversation"],
       async onCacheEntryAdded(
         arg,
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved }
@@ -25,27 +28,20 @@ export const conversationApiSlice = apiSlice.injectEndpoints({
         });
 
         try {
+          const { auth, user } = JSON.parse(localStorage.getItem("auth"));
           await cacheDataLoaded;
-          console.log("cashe entry loaded");
-          socket.on("conversation", (data) => {
-            console.log("requested");
-            console.log(data);
 
+          socket.on("conversations", (data) => {
             updateCachedData((draft) => {
-              console.log(draft.length);
               const conversation = draft.find((c) => c.id == data?.data?.id);
-              console.log(conversation);
 
               if (conversation?.id) {
                 conversation.message = data?.data?.message;
                 conversation.timestamp = data?.data?.timestamp;
               } else {
-                const participants = data?.data?.participants.split("-");
-                const sender = participants[0];
-                const receiver = participants[1];
-                console.log(draft.data);
-                if (receiver === arg) {
-                  draft.push(data?.data);
+                const userEmail = data?.data.participants.split("-")[1];
+                if (userEmail === user.email) {
+                  draft.unshift(data?.data);
                 }
               }
             });
@@ -57,10 +53,11 @@ export const conversationApiSlice = apiSlice.injectEndpoints({
       },
     }),
     getConversation: builder.query({
-      query: ({ userEmail, participantEmail }) => ({
-        url: `/conversations?participants_like=${userEmail}-${participantEmail}&&participants_like=${participantEmail}-${userEmail}}`,
+      query: ({ sender, receiver }) => ({
+        url: `/conversations?participants_like=${sender}-${receiver}&&participants_like=${receiver}-${sender}}`,
         method: "GET",
       }),
+      invalidatesTags: ["conversation"],
     }),
     // add conversation mudation for add a new conversation
     addConversation: builder.mutation({
@@ -69,20 +66,23 @@ export const conversationApiSlice = apiSlice.injectEndpoints({
         method: "POST",
         body: data,
       }),
+      invalidatesTags: ["add"],
+
       async onQueryStarted(arg, { queryFulfilled, dispatch }) {
         const conversation = await queryFulfilled;
 
-        dispatch(
-          apiSlice.util.updateQueryData(
-            "getConversations",
-            conversation.data.sender,
-            (draft) => {
-              draft.push(conversation.data);
-            }
-          )
-        );
-
         try {
+          dispatch(
+            apiSlice.util.updateQueryData(
+              "getConversations",
+              arg.sender,
+              (draft) => {
+                console.log(current(draft));
+                draft.unshift(conversation?.data);
+              }
+            )
+          );
+
           if (conversation?.data.id) {
             const sender = arg.users.find((user) => user.email === arg.sender);
             const receiver = arg.users.find(

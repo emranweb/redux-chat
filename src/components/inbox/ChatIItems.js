@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import moment from "moment";
 import gravatarUrl from "gravatar-url";
 import { Link } from "react-router-dom";
+import { v4 as uuidv4 } from "uuid";
 
 export default function ChatItems() {
   const authData = useSelector((state) => state.auth);
@@ -37,7 +38,7 @@ export default function ChatItems() {
         item.users.find((user) => user.email !== email);
 
       return (
-        <li key={id}>
+        <li key={uuidv4()}>
           <Link to={`/inbox/${id}`}>
             <ChatItem
               avatar={gravatarUrl(participateEmail, 80)}

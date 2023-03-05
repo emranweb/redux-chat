@@ -23,33 +23,31 @@ export default function Modal({ open, control }) {
   const [message, setMessage] = useState();
   const [checkUser, setCheckUser] = useState(false);
   const [to, setTo] = useState();
-  const { user } = useSelector((state) => state.auth) || {};
-  const { email: loginUser } = user;
   const [conversation, setConversation] = useState(undefined);
   const [error, setError] = useState("");
+  const { user: loginUser } = useSelector((state) => state.auth) || {};
+  const dispatch = useDispatch();
 
-  const { data: userEmail } = useGetUserQuery(to, {
+  const { email: loginUserEmail } = loginUser;
+
+  const { data: participentUser } = useGetUserQuery(to, {
     skip: !checkUser,
   });
 
   // add conversation
-
   const [addConversation, { isSuccess: addConversationSuccess }] =
     useAddConversationMutation();
 
   // edit conversation
-
   const [editConversation, { isSuccess: editConversationSuccess }] =
     useEditConversationMutation();
 
-  const dispatch = useDispatch();
-
   useEffect(() => {
-    if (userEmail?.length > 0) {
+    if (participentUser?.length > 0) {
       dispatch(
         conversationApiSlice.endpoints.getConversation.initiate({
-          userEmail: loginUser,
-          participantEmail: to,
+          sender: loginUserEmail,
+          receiver: to,
         })
       )
         .unwrap()
@@ -57,7 +55,7 @@ export default function Modal({ open, control }) {
         .catch((error) => setError(error));
     }
     // get conversation
-  }, [userEmail, dispatch, loginUser, to]);
+  }, [participentUser, dispatch, loginUser, to]);
 
   // conversation sucess modal close
 
@@ -85,19 +83,19 @@ export default function Modal({ open, control }) {
     if (conversation?.length > 0) {
       editConversation({
         id: conversation[0].id,
-        sender: loginUser,
+        sender: loginUserEmail,
         data: {
-          participants: `${loginUser}-${userEmail[0].email}`,
-          users: [user, userEmail[0]],
+          participants: `${loginUser}-${participentUser[0].email}`,
+          users: [loginUser, participentUser[0]],
           message,
           timeStamp: new Date().getTime(),
         },
       });
     } else if (conversation?.length === 0) {
       addConversation({
-        participants: `${loginUser}-${userEmail[0].email}`,
-        sender: loginUser,
-        users: [user, userEmail[0]],
+        participants: `${loginUserEmail}-${participentUser[0].email}`,
+        sender: loginUserEmail,
+        users: [loginUser, participentUser[0]],
         message,
         timeStamp: new Date().getTime(),
       });
@@ -159,17 +157,19 @@ export default function Modal({ open, control }) {
                 className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-violet-600 hover:bg-violet-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-violet-500 disabled:opacity-30"
                 disabled={
                   conversation === undefined ||
-                  (userEmail?.length > 0 && userEmail[0].email === loginUser)
+                  (participentUser?.length > 0 &&
+                    participentUser[0].email === loginUser)
                 }
               >
                 Send Message
               </button>
             </div>
-            {userEmail?.length === 0 && <Error message="No user Found" />}
+            {participentUser?.length === 0 && <Error message="No user Found" />}
             {error && <Error message={error} />}
-            {userEmail?.length > 0 && userEmail[0].email === loginUser && (
-              <Error message="You Can't Send Email Yourself" />
-            )}
+            {participentUser?.length > 0 &&
+              participentUser[0].email === loginUser && (
+                <Error message="You Can't Send Email Yourself" />
+              )}
           </form>
         </div>
       </>
