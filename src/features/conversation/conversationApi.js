@@ -8,10 +8,18 @@ export const conversationApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getConversations: builder.query({
       query: (email) => ({
-        url: `/conversations?participants_like=${email}&_sort=timestamp&_order=desc&_page=1&_limit=5`,
+        url: `/conversations?participants_like=${email}&_sort=timestamp&_order=desc&_page=1&_limit=${process.env.REACT_APP_CONVERSATIONS_PER_PAGE}`,
         method: "GET",
       }),
-      invalidatesTags: ["getconversation"],
+      transformResponse(apiResponse, meta) {
+        const totalCount = meta.response.headers.get("X-Total-Count");
+
+        return {
+          data: apiResponse,
+          totalCount: totalCount,
+        };
+      },
+
       async onCacheEntryAdded(
         arg,
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved }
@@ -33,7 +41,9 @@ export const conversationApiSlice = apiSlice.injectEndpoints({
 
           socket.on("conversations", (data) => {
             updateCachedData((draft) => {
-              const conversation = draft.find((c) => c.id == data?.data?.id);
+              const conversation = draft?.data.find(
+                (c) => c.id == data?.data?.id
+              );
 
               if (conversation?.id) {
                 conversation.message = data?.data?.message;
@@ -41,7 +51,7 @@ export const conversationApiSlice = apiSlice.injectEndpoints({
               } else {
                 const userEmail = data?.data.participants.split("-")[1];
                 if (userEmail === user.email) {
-                  draft.unshift(data?.data);
+                  draft.data.push(data?.data);
                 }
               }
             });
@@ -52,12 +62,18 @@ export const conversationApiSlice = apiSlice.injectEndpoints({
         socket.close();
       },
     }),
+    getMoreConversations: builder.query({
+      query: ({ email, page }) => ({
+        url: `/conversations?participants_like=${email}&_sort=timestamp&_order=desc&_page=${page}&_limit=${process.env.REACT_APP_CONVERSATIONS_PER_PAGE}`,
+        method: "GET",
+      }),
+    }),
+
     getConversation: builder.query({
       query: ({ sender, receiver }) => ({
         url: `/conversations?participants_like=${sender}-${receiver}&&participants_like=${receiver}-${sender}}`,
         method: "GET",
       }),
-      invalidatesTags: ["conversation"],
     }),
     // add conversation mudation for add a new conversation
     addConversation: builder.mutation({
@@ -77,8 +93,7 @@ export const conversationApiSlice = apiSlice.injectEndpoints({
               "getConversations",
               arg.sender,
               (draft) => {
-                console.log(current(draft));
-                draft.unshift(conversation?.data);
+                draft.data.push(conversation?.data);
               }
             )
           );
@@ -120,7 +135,7 @@ export const conversationApiSlice = apiSlice.injectEndpoints({
             "getConversations",
             arg.sender,
             (draft) => {
-              const draftConversation = draft.find((c) => c.id == arg.id);
+              const draftConversation = draft.data.find((c) => c.id == arg.id);
               draftConversation.message = arg.data.message;
               draftConversation.timestamp = arg.data.timestamp;
             }

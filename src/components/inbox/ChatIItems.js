@@ -8,12 +8,10 @@ import { v4 as uuidv4 } from "uuid";
 
 export default function ChatItems() {
   const authData = useSelector((state) => state.auth);
-  const {
-    data: conversation,
-    error,
-    isLoading,
-    isError,
-  } = useGetConversationsQuery(authData.user.email);
+  const { data, error, isLoading, isError } = useGetConversationsQuery(
+    authData.user.email
+  );
+  const { data: conversations, totalCount } = data || {};
 
   let content = null;
   if (isLoading) {
@@ -23,15 +21,15 @@ export default function ChatItems() {
   } else if (
     isLoading === false &&
     isError === false &&
-    conversation.length === 0
+    conversations.length === 0
   ) {
     content = <h1>No Data Found</h1>;
   } else if (
-    conversation.length > 0 &&
+    conversations.length > 0 &&
     isLoading === false &&
     isError === false
   ) {
-    content = conversation.map((item) => {
+    content = conversations.map((item) => {
       const { id, timestamp, message } = item;
       const email = authData?.user.email;
       const { name: participateName, email: participateEmail } =
