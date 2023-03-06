@@ -7,9 +7,17 @@ export const messageApiSlice = apiSlice.injectEndpoints({
   endpoints: (builder) => ({
     getMessages: builder.query({
       query: (id) => ({
-        url: `/messages?conversationId=${id}&_sort=timestamp&_order=desc`,
+        url: `/messages?conversationId=${id}&_sort=timestamp&_order=desc&_page=1&_limit=${process.env.REACT_APP_MESSAGES_PER_PAGE}`,
         method: "GET",
       }),
+      transformResponse(apiResponse, meta) {
+        const totalCount = meta.response.headers.get("X-Total-Count");
+        console.log(totalCount);
+        return {
+          data: apiResponse,
+          totalCount: totalCount,
+        };
+      },
       async onCacheEntryAdded(
         arg,
         { updateCachedData, cacheDataLoaded, cacheEntryRemoved, getState }
@@ -31,7 +39,7 @@ export const messageApiSlice = apiSlice.injectEndpoints({
             updateCachedData((draft) => {
               if (data?.data?.receiver?.email === getRecievedUserEmail) {
                 console.log("condidtion check");
-                draft.push(data?.data);
+                draft.data.push(data?.data);
               }
             });
           });
@@ -42,6 +50,31 @@ export const messageApiSlice = apiSlice.injectEndpoints({
         socket.close();
       },
     }),
+
+    getMoreMessages: builder.query({
+      query: ({ id, page }) => ({
+        url: `/messages?conversationId=${id}&_sort=timestamp&_order=desc&_page=${page}&_limit=${process.env.REACT_APP_MESSAGES_PER_PAGE}`,
+        method: "GET",
+      }),
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        const messages = await queryFulfilled;
+        try {
+          if (messages) {
+            dispatch(
+              apiSlice.util.updateQueryData("getMessages", arg.id, (draft) => {
+                return {
+                  data: [...draft.data, ...messages.data],
+                  totalCount: Number(draft.totalCount),
+                };
+              })
+            );
+          }
+        } catch (error) {
+          console.log(error);
+        }
+      },
+    }),
+
     addMessage: builder.mutation({
       query: (data) => ({
         url: `/messages`,

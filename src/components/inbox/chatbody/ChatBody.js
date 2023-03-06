@@ -7,7 +7,9 @@ import { useParams } from "react-router-dom";
 
 export default function ChatBody() {
   const { id } = useParams();
-  const { data: messages, isLoading, isError } = useGetMessagesQuery(id);
+  const { data, isLoading, isError } = useGetMessagesQuery(id);
+  const { data: messages, totalCount } = data || {};
+
   let content = null;
   if (isLoading) {
     content = <h1>Data is loading</h1>;
@@ -19,7 +21,7 @@ export default function ChatBody() {
     content = (
       <div className="w-full grid conversation-row-grid">
         <ChatHead message={messages[0]} />
-        <Messages messages={messages} />
+        <Messages messages={messages} totalCount={totalCount} />
         <Options info={messages[0]} />
         {/* <Blank /> */}
       </div>

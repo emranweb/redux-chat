@@ -51,7 +51,7 @@ export const conversationApiSlice = apiSlice.injectEndpoints({
               } else {
                 const userEmail = data?.data.participants.split("-")[1];
                 if (userEmail === user.email) {
-                  draft.data.push(data?.data);
+                  draft.data.unshift(data?.data);
                 }
               }
             });
@@ -67,6 +67,27 @@ export const conversationApiSlice = apiSlice.injectEndpoints({
         url: `/conversations?participants_like=${email}&_sort=timestamp&_order=desc&_page=${page}&_limit=${process.env.REACT_APP_CONVERSATIONS_PER_PAGE}`,
         method: "GET",
       }),
+      async onQueryStarted(arg, { queryFulfilled, dispatch }) {
+        const conversation = await queryFulfilled;
+        try {
+          if (conversation) {
+            dispatch(
+              apiSlice.util.updateQueryData(
+                "getConversations",
+                arg.email,
+                (draft) => {
+                  return {
+                    data: [...draft.data, ...conversation.data],
+                    totalCount: Number(draft.totalCount),
+                  };
+                }
+              )
+            );
+          }
+        } catch (error) {
+          console.log("error");
+        }
+      },
     }),
 
     getConversation: builder.query({
@@ -93,7 +114,7 @@ export const conversationApiSlice = apiSlice.injectEndpoints({
               "getConversations",
               arg.sender,
               (draft) => {
-                draft.data.push(conversation?.data);
+                draft.data.unshift(conversation?.data);
               }
             )
           );
@@ -170,7 +191,7 @@ export const conversationApiSlice = apiSlice.injectEndpoints({
                 "getMessages",
                 res.conversationId.toString(),
                 (draft) => {
-                  draft.push(res);
+                  draft.data.push(res);
                 }
               )
             );
